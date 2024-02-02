@@ -11,36 +11,36 @@ CREATE TABLE session (
     FOREIGN KEY (user_id) REFERENCES user(id)
 );
 
-CREATE TABLE item (
+CREATE TABLE product (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     price_map TEXT NOT NULL,
     
     description TEXT,
     materials TEXT,
-    colors TEXT,
-    care_guide TEXT
+    colors TEXT
 );
 
-CREATE TABLE item_unit (
-    item_id INTEGER NOT NULL PRIMARY KEY,
-    size TEXT NOT NULL,
+CREATE TABLE product_unit (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    product_id INTEGER NOT NULL,
+    label TEXT NOT NULL,
     amount INTEGER NOT NULL,
 
-    FOREIGN KEY (item_id) REFERENCES item(id)
+    FOREIGN KEY (product_id) REFERENCES product(id)
 );
 
-CREATE TABLE item_order (
+CREATE TABLE product_order (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     buyer TEXT NOT NULL,
-    item_id INTEGER NOT NULL,
+    product_id INTEGER NOT NULL,
     shipping_adress_id INTEGER NOT NULL,
     currency TEXT NOT NULL,
     total_unit_price INTEGER NOT NULL,
     status TEXT NOT NULL,
 
     FOREIGN KEY (buyer) REFERENCES user(username),
-    FOREIGN KEY (item_id) REFERENCES item(id),
+    FOREIGN KEY (product_id) REFERENCES product(id),
     FOREIGN KEY (shipping_adress_id) REFERENCES shipping_adress(id)
 );
 
@@ -58,4 +58,10 @@ CREATE TABLE sale (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     discount_map TEXT NOT NULL
+);
+
+CREATE TABLE moderator (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    ip TEXT NOT NULL UNIQUE,
+    password TEXT NOT NULL
 );

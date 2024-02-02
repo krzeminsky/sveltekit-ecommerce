@@ -1,0 +1,1 @@
+export const modSessions = new Map<string, number>();
