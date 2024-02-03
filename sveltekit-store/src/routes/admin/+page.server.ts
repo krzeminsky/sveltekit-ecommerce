@@ -1,10 +1,10 @@
 import { env } from '$env/dynamic/private';
-import { authorizeModerator, getModeratorPasswordByIp, getModerators } from '$lib/server/auth/moderators.js'
+import { authorizeModerator, getModeratorPasswordByIp, getModeratorIps } from '$lib/server/auth/moderators.js'
 import { error, fail, redirect } from '@sveltejs/kit';
 import { Argon2id } from "oslo/password";
 
 export const load = async ({ getClientAddress }) => {
-    const modIps = getModerators();
+    const modIps = getModeratorIps();
     const incomingIp = getClientAddress();
 
     if (incomingIp !== env.ADMIN_IP && !modIps.includes(incomingIp)) throw error(404);

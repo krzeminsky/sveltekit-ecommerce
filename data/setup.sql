@@ -17,6 +17,7 @@ CREATE TABLE product (
     price_map TEXT NOT NULL,
     
     description TEXT,
+    category TEXT,
     materials TEXT,
     colors TEXT
 );
@@ -38,6 +39,7 @@ CREATE TABLE product_order (
     currency TEXT NOT NULL,
     total_unit_price INTEGER NOT NULL,
     status TEXT NOT NULL,
+    creation_time INTEGER NOT NULL,
 
     FOREIGN KEY (buyer) REFERENCES user(username),
     FOREIGN KEY (product_id) REFERENCES product(id),
@@ -57,11 +59,13 @@ CREATE TABLE shipping_adress (
 CREATE TABLE sale (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
+    expires_at INTEGER NOT NULL,
     discount_map TEXT NOT NULL
 );
 
 CREATE TABLE moderator (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     ip TEXT NOT NULL UNIQUE,
+    nickname TEXT NOT NULL,
     password TEXT NOT NULL
 );

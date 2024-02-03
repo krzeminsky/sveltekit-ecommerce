@@ -11,7 +11,7 @@
             <ReactiveA href="/admin/activeSales">Active sales</ReactiveA>
         </div>
 
-        <div class="p-6 flex-1">
+        <div class="relative p-6 flex-1">
             <slot/>
         </div>
     </div>

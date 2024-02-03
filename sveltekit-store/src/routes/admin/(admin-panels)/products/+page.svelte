@@ -1,8 +1,10 @@
 <script lang="ts">
     import DropdownMenu from "$lib/components/other/dropdown-menu.svelte";
-    import RadioIconGroup from "$lib/components/other/radio-icon-group.svelte";
+    import SortBy from "$lib/components/composites/sort-by.svelte";
     import Search from "$lib/components/other/search.svelte";
     import type { PageData } from "./$types";
+    import IconButton from "$lib/components/ui/icon-button.svelte";
+    import TopbarContentLayout from "$lib/components/layouts/topbar-content-layout.svelte";
 
     export let data: PageData;
 </script>
@@ -11,16 +13,26 @@
     <title>Products</title>
 </svelte:head>
 
-<div class="flex gap-2 justify-between items-center">
-    <div class="flex items-center gap-2">
-        <Search/>
+<TopbarContentLayout>
+    <svelte:fragment slot="topbar">
+        <div class="flex items-center gap-4 flex-shrink-0">
+            <Search placeholder="Search by name" />
+    
+            <SortBy sortOptions={["Name", "Price", "Age"]} />
 
-        <div id="sort-options">
-            <DropdownMenu label="Sort by" options={["Name", "Price", "Age"]}/>
+            <DropdownMenu label="Cateogry" allowMultiple={true} options={data.categories} />
 
-            <RadioIconGroup iconPaths={["/icons/expand/expand-more.svg", "/icons/expand/expand-less.svg"]}/>
+            <IconButton src="/icons/refresh.svg" alt="Refresh products" />
         </div>
-    </div>
+    
+        <a href="products/-1" class="text-button">Add product</a>
+    </svelte:fragment>
 
-    <button class="text-button">Add product</button>
-</div>
+    <svelte:fragment slot="content">
+        {#if data.products.length == 0}
+        <h1 class="placeholder-center-text">Future products will be displayed here</h1>
+        {:else}
+        .
+        {/if}
+    </svelte:fragment>
+</TopbarContentLayout>

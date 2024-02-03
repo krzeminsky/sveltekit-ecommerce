@@ -4,10 +4,17 @@
 @tailwind utilities;
 
 .button {
-    @apply p-2 bg-indigo-500 rounded-full shadow-md hover:shadow-lg transition-all text-white;
+    @apply p-2 bg-indigo-500 rounded-full shadow-md hover:shadow-lg active:shadow-lg transition-all text-white;
 }
 
 .text-button {
-    @apply bg-indigo-500 rounded-full shadow-md hover:shadow-lg transition-all text-white px-4 py-2;
+    @apply bg-indigo-500 rounded-full shadow-md hover:shadow-lg active:shadow-lg transition-all text-white px-4 py-2 text-nowrap;
 }
 
+.center-absolute {
+    @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2;
+}
+
+.placeholder-center-text {
+    @apply center-absolute text-gray-400 pointer-events-none select-none;
+}

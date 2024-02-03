@@ -36,8 +36,12 @@ export function getModeratorPasswordByIp(ip: string) {
     return db.prepare("SELECT password FROM moderator WHERE ip = ?").pluck(true).get(ip) as string|undefined;
 }
 
-export function getModerators() {
+export function getModeratorIps() {
     return db.prepare("SELECT ip FROM moderator").pluck(true).all() as string[];
+}
+
+export function getModerators() {
+    return db.prepare("SELECT id, ip, nickname FROM moderator").all() as { id: number, ip: string, nickname: string }[]
 }
 
 export function protectAdminRoute(ip: string) {
