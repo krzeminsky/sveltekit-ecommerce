@@ -17,7 +17,7 @@ import Search from "$lib/components/other/search.svelte";
     <svelte:fragment slot="topbar">
         <Search placeholder="Search by nickname" />
     
-        <button class="text-button">Add moderator</button>
+        <a href="moderators/-1" class="text-button">Add moderator</a>
     </svelte:fragment>
 
     <svelte:fragment slot="content">

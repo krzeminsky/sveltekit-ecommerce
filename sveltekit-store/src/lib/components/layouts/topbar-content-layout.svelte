@@ -3,7 +3,7 @@
 </script>
 
 <div class="w-full h-full flex flex-col">
-    <div class="relative w-full flex gap-4 {justifyBetweenTopBar? 'justify-between' : ''} items-center mb-2">
+    <div class="relative w-full flex gap-4 {justifyBetweenTopBar? 'justify-between' : ''} items-center mb-8">
         <slot name="topbar" />
     </div>
 

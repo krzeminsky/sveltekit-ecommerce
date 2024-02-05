@@ -5,8 +5,52 @@
     import type { PageData } from "./$types";
     import IconButton from "$lib/components/ui/icon-button.svelte";
     import TopbarContentLayout from "$lib/components/layouts/topbar-content-layout.svelte";
+    import type { Product, ProductFetchOptions } from "$lib/types/product";
+    import { onMount } from "svelte";
+    import ProgressIndicator from "$lib/components/ui/progress-indicator.svelte";
 
     export let data: PageData;
+
+    const sortOptions = ["Name", "Price"];
+
+    let products: Product[] = [];
+
+    let searchValue: string;
+    let selectedSortOption: number;
+    let sortDescending: boolean;
+
+    let selectedCategories: number[];
+
+    let awaitingResponse = false;
+
+    onMount(() => {
+        fetchProducts();
+    })
+
+    async function fetchProducts() {
+        const categories = selectedCategories.map(c => data.categories[c]);
+
+        awaitingResponse = true;
+
+        const query = JSON.stringify({
+            page: 0,
+            count: 10,
+            options: {
+                name: searchValue,
+                categories,
+                sortOptions: {
+                    sortBy: sortOptions[selectedSortOption],
+                    descending: sortDescending
+                }
+            } as ProductFetchOptions
+        });
+
+        const res = await fetch(`/api/products?query=${query}`, { method: "GET" })
+
+        products = await res.json();
+
+        awaitingResponse = false;
+    }
 </script>
 
 <svelte:head>
@@ -16,23 +60,29 @@
 <TopbarContentLayout>
     <svelte:fragment slot="topbar">
         <div class="flex items-center gap-4 flex-shrink-0">
-            <Search placeholder="Search by name" />
+            <Search placeholder="Search by name" bind:value={searchValue} />
     
-            <SortBy sortOptions={["Name", "Price", "Age"]} />
+            <SortBy {sortOptions} bind:selected={selectedSortOption} bind:descending={sortDescending} />
 
-            <DropdownMenu label="Cateogry" allowMultiple={true} options={data.categories} />
+            <DropdownMenu label="Cateogry" allowMultiple={true} options={data.categories} bind:selected={selectedCategories} />
 
-            <IconButton src="/icons/refresh.svg" alt="Refresh products" />
+            <IconButton src="/icons/refresh.svg" alt="Refresh products" on:click={fetchProducts} />
         </div>
     
         <a href="products/-1" class="text-button">Add product</a>
     </svelte:fragment>
 
     <svelte:fragment slot="content">
-        {#if data.products.length == 0}
-        <h1 class="placeholder-center-text">Future products will be displayed here</h1>
+        {#if awaitingResponse}
+        <div class="center-absolute">
+            <ProgressIndicator size={64} fillColor="rgb(229 231 235)"/>
+        </div>
         {:else}
-        .
+            {#if products.length == 0}
+            <h1 class="placeholder-center-text">Future products will be displayed here</h1>
+            {:else}
+            .
+            {/if}
         {/if}
     </svelte:fragment>
 </TopbarContentLayout>

@@ -5,7 +5,7 @@
     export let sortOptions: string[];
     export let descending = true;
 
-    let selected = 0;
+    export let selected = 0;
     $: descending = selected == 0;
 </script>
 

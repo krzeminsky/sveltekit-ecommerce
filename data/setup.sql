@@ -11,21 +11,25 @@ CREATE TABLE session (
     FOREIGN KEY (user_id) REFERENCES user(id)
 );
 
+CREATE TABLE currency (
+    code TEXT NOT NULL PRIMARY KEY,
+    conversion_rate REAL NOT NULL
+);
+
 CREATE TABLE product (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
-    price_map TEXT NOT NULL,
-    
-    description TEXT,
-    category TEXT,
-    materials TEXT,
-    colors TEXT
+    price INTEGER NOT NULL,
+
+    category TEXT NOT NULL,
+    materials TEXT NOT NULL
 );
 
-CREATE TABLE product_unit (
+CREATE TABLE product_variant (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     product_id INTEGER NOT NULL,
-    label TEXT NOT NULL,
+    color TEXT NOT NULL,
+    size TEXT NOT NULL,
     amount INTEGER NOT NULL,
 
     FOREIGN KEY (product_id) REFERENCES product(id)
@@ -35,14 +39,19 @@ CREATE TABLE product_order (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     buyer TEXT NOT NULL,
     product_id INTEGER NOT NULL,
+    variant_id INTEGER NOT NULL,
     shipping_adress_id INTEGER NOT NULL,
+
     currency TEXT NOT NULL,
-    total_unit_price INTEGER NOT NULL,
+    applied_conversion_rate REAL NOT NULL,
+    total_price INTEGER NOT NULL,
+    
     status TEXT NOT NULL,
     creation_time INTEGER NOT NULL,
 
     FOREIGN KEY (buyer) REFERENCES user(username),
     FOREIGN KEY (product_id) REFERENCES product(id),
+    FOREIGN KEY (variant_id) REFERENCES product_variant(id),
     FOREIGN KEY (shipping_adress_id) REFERENCES shipping_adress(id)
 );
 

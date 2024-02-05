@@ -1,5 +1,6 @@
 import { env } from '$env/dynamic/private';
 import { authorizeModerator, getModeratorPasswordByIp, getModeratorIps } from '$lib/server/auth/moderators.js'
+import { fetchProducts } from '$lib/server/database/products.js';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { Argon2id } from "oslo/password";
 
