@@ -3,21 +3,36 @@
     import TextAreaField from "$lib/components/form/text-area-field.svelte";
     import TopbarContentLayout from "$lib/components/layouts/topbar-content-layout.svelte";
     import Breadcrumbs from "$lib/components/other/breadcrumbs.svelte";
+    import IconButton from "$lib/components/ui/icon-button.svelte";
+    import { onMount } from "svelte";
     import type { PageData } from "./$types";
 
     export let data: PageData;
+    let productRecord = data.productRecord;
 
-    let propertiesChanged = false;
-
+    let name = '';
+    let description = '';
+    let price: number;
+    let category = '';
+    let addMaterialValue = '';
     let materials: string[] = [];
 
-    function addMaterial(e: KeyboardEvent) {
-        const target = e.currentTarget as HTMLInputElement;
-        const val = target.value.trim();
+    $: allowSubmit = name && description && price && category && materials.length != 0;
 
-        if (e.key == "Enter" && val) {
-            materials.push(val);
-            target.value = '';
+    onMount(() => {
+        if (productRecord.product.id != -1) {
+            name = productRecord.product.name;
+            description = productRecord.product.description;
+            price = productRecord.product.price;
+            category = productRecord.product.category;
+            materials = productRecord.product.materials.split(',')
+        }
+    });
+
+    function addMaterial() {        
+        if (addMaterialValue) {
+            materials.push(addMaterialValue);
+            addMaterialValue = '';
             materials = materials;
         }
     }
@@ -34,44 +49,62 @@
 
         <div class="flex gap-4">
             <button class="text-button-outlined outline-rose-400 text-rose-400">Delete product</button>
-            <button class="text-button" disabled={!propertiesChanged}>Save changes</button>
+            <button class="text-button" disabled={!allowSubmit}>Save changes</button>
         </div>
     </svelte:fragment>
 
     <svelte:fragment slot="content">
         <h1 class="text-indigo-500 text-3xl mb-8">Product info</h1>
         
-        <table id="product-editor">
+        <table id="product-editor" class="mb-8">
             <tr>
                 <td>
-                    <InputField id="name" label="Name" placeholder="Name" />
+                    <InputField id="name" label="Name" placeholder="Name" bind:value={name} />
                 </td>
 
                 <td rowspan="3">
-                    <TextAreaField id="description" label="Description" placeholder="Write a short description..." />
+                    <TextAreaField id="description" label="Description" placeholder="Write a short description..." bind:value={description} />
                 </td>
 
                 <td rowspan="3">
                     <div class="w-full h-full flex flex-col items-start gap-2">
-                        <InputField id="add-material" label="Add material" placeholder="Add material" on:keydown={addMaterial} />
+                        <InputField id="add-material" label="Add material" placeholder="Add material" bind:value={addMaterialValue} on:keydown={e => { if (e.key == "Enter") addMaterial() }}>
+                            <IconButton src="/icons/add.svg" alt="Add material" on:click={addMaterial} />
+                        </InputField>
 
-                        <Breadcrumbs bind:content={materials} />
+                        <div class="w-full flex-1 basis-0 overflow-y-scroll">
+                            <Breadcrumbs bind:content={materials} />
+                        </div>
                     </div>
                 </td>
             </tr>
 
             <tr>
                 <td>
-                    <InputField id="unitPrice" label="Unit price" placeholder="Unit price" type="number" />
+                    <InputField id="unitPrice" label="Unit price" placeholder="Unit price" type="number" bind:value={price}/>
                 </td>
             </tr>
 
             <tr>
                 <td>
-                    <InputField id="category" label="Category" placeholder="Category" />
+                    <InputField id="category" label="Category" placeholder="Category" bind:value={category} />
                 </td>
             </tr>
         </table>
+
+        <h1 class="text-indigo-500 text-3xl mb-8">Product variants</h1>
+
+        <div class="grid">
+            {#each productRecord.variants as v}
+            <div>
+
+            </div>
+            {/each}
+
+            <button class="w-full py-6 border-dashed border-2 border-indigo-400 rounded-lg grid place-content-center">
+                <h1 class="text-xl text-indigo-400">Add variant</h1>
+            </button>
+        </div>
     </svelte:fragment>
 </TopbarContentLayout>
 

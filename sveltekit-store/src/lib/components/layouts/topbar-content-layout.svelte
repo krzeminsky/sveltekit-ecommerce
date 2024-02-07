@@ -7,7 +7,7 @@
         <slot name="topbar" />
     </div>
 
-    <div class="rlative flex-1">
+    <div class="relative flex-1 basis-0 overflow-y-auto">
         <slot name="content" />
     </div>
 </div>
