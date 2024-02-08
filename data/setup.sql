@@ -30,8 +30,7 @@ CREATE TABLE product_variant (
     id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     product_id INTEGER NOT NULL,
     color TEXT NOT NULL,
-    size TEXT NOT NULL,
-    amount INTEGER NOT NULL,
+    stock_map TEXT NOT NULL,
 
     FOREIGN KEY (product_id) REFERENCES product(id)
 );

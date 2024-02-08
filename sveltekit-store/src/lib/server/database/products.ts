@@ -22,6 +22,14 @@ function any<T>(arr: T[], predicate: (item: T) => boolean) {
     return false;
 }
 
+function includesAny(val: string, search: string[]) {
+    for (const s of search) {
+        if (val.includes(s)) return true;
+    }
+
+    return false;
+}
+
 export function fetchProducts(count: number, page: number, options?: ProductFetchOptions) {
     let products = Array.from(productsCache.values());
 
@@ -53,7 +61,7 @@ export function fetchProducts(count: number, page: number, options?: ProductFetc
             const variantSearchOptions = options.variantSearchOptions!;
 
             if (variantSearchOptions.sizes && variantSearchOptions.sizes.length > 0) {
-                products = products.filter(r => any(r.variants, v => variantSearchOptions.sizes!.includes(v.size)));
+                products = products.filter(r => any(r.variants, v => includesAny(v.stock_map, variantSearchOptions.sizes!)));
             }
 
             if (variantSearchOptions.colors && variantSearchOptions.colors.length > 0) {

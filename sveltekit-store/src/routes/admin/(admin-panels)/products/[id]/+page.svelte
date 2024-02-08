@@ -8,7 +8,9 @@
     import type { PageData } from "./$types";
 
     export let data: PageData;
+
     let productRecord = data.productRecord;
+    let variants: { id: number, color: string, stock: { size: string, amount: number }[] }[] = [];
 
     let name = '';
     let description = '';
@@ -25,7 +27,13 @@
             description = productRecord.product.description;
             price = productRecord.product.price;
             category = productRecord.product.category;
-            materials = productRecord.product.materials.split(',')
+            materials = productRecord.product.materials.split(',');
+
+            productRecord.variants.forEach(v => {
+                variants.push({ id: v.id, color: v.color, stock: JSON.parse(v.stock_map) });
+            });
+
+            variants = variants;
         }
     });
 
@@ -35,6 +43,22 @@
             addMaterialValue = '';
             materials = materials;
         }
+    }
+
+    function addVariant() {
+        variants.push({ id: -1, color: '', stock: [] });
+        variants = variants;
+    }
+
+    function addStockVariant(targetVariant: { size: string, amount: number }[]) {
+        targetVariant.push({ size: '', amount: 0 });
+        variants = variants;
+    }
+
+    function saveChanges() {
+
+
+        fetch('/api/admin/product', { method: "POST" });
     }
 </script>
 
@@ -49,7 +73,7 @@
 
         <div class="flex gap-4">
             <button class="text-button-outlined outline-rose-400 text-rose-400">Delete product</button>
-            <button class="text-button" disabled={!allowSubmit}>Save changes</button>
+            <button class="text-button" disabled={!allowSubmit} on:click={saveChanges}>Save changes</button>
         </div>
     </svelte:fragment>
 
@@ -67,7 +91,7 @@
                 </td>
 
                 <td rowspan="3">
-                    <div class="w-full h-full flex flex-col items-start gap-2">
+                    <div class="w-full h-full flex flex-col items-start">
                         <InputField id="add-material" label="Add material" placeholder="Add material" bind:value={addMaterialValue} on:keydown={e => { if (e.key == "Enter") addMaterial() }}>
                             <IconButton src="/icons/add.svg" alt="Add material" on:click={addMaterial} />
                         </InputField>
@@ -94,22 +118,55 @@
 
         <h1 class="text-indigo-500 text-3xl mb-8">Product variants</h1>
 
-        <div class="grid">
-            {#each productRecord.variants as v}
-            <div>
+        <div class="px-4 grid gap-4">
+            {#each variants as v, i (v)}
+            <div class="w-full px-4 py-8 border-2 border-indigo-400 rounded-lg">
+                <table id="variant-editor">
+                    <tr>
+                        <td class="align-top">
+                            <InputField label="Color" placeholder="Color" />
+                        </td>
 
+                        <td class="align-bottom" style="width: 28rem">
+                            <div class="grid grid-cols-3 gap-2 justify-center">
+                                {#each v.stock as pair, i (pair)}
+                                <InputField label="Size" placeholder="Size" bind:value={pair.size} />
+                                <InputField label="Amount" placeholder="Amount" type="number" bind:value={pair.amount} />
+
+                                <button class="text-button-outlined outline-rose-400 text-rose-400 justify-self-center self-end w-full" on:click={() => {v.stock.splice(i, 1); variants = variants}}>
+                                    Delete
+                                </button>
+                                {/each}
+    
+                                <button class="dashed-border-button py-1.5 col-span-3" on:click={() => addStockVariant(v.stock)}>
+                                    Add stock variant
+                                </button>
+                            </div>
+                        </td>
+
+                        <td class="align-top">
+                            <button class="text-button-outlined outline-rose-400 text-rose-400 mt-6" on:click={() => {variants.splice(i, 1); variants = variants}}>
+                                Delete variant
+                            </button>
+                        </td>
+                    </tr>
+                </table>
             </div>
             {/each}
 
-            <button class="w-full py-6 border-dashed border-2 border-indigo-400 rounded-lg grid place-content-center">
-                <h1 class="text-xl text-indigo-400">Add variant</h1>
+            <button class="py-6 dashed-border-button" on:click={addVariant}>
+                <h1 class="text-xl">Add variant</h1>
             </button>
         </div>
     </svelte:fragment>
 </TopbarContentLayout>
 
 <style lang="postcss">
-    #product-editor td {
-        @apply relative w-96 p-4 h-1;
+    table td {
+        @apply relative w-96 px-4 py-1 h-1;
+    }
+
+    .dashed-border-button {
+        @apply w-full border-dashed border-2 border-indigo-400 rounded-lg text-indigo-400 text-center;
     }
 </style>
