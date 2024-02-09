@@ -6,10 +6,12 @@
     import IconButton from "$lib/components/ui/icon-button.svelte";
     import { onMount } from "svelte";
     import type { PageData } from "./$types";
+    import ProgressIndicator from "$lib/components/ui/progress-indicator.svelte";
+    import { goto } from "$app/navigation";
 
     export let data: PageData;
 
-    let productRecord = data.productRecord;
+    $: productRecord = data.productRecord;
     let variants: { id: number, color: string, stock: { size: string, amount: number }[] }[] = [];
 
     let name = '';
@@ -19,7 +21,9 @@
     let addMaterialValue = '';
     let materials: string[] = [];
 
-    $: allowSubmit = name && description && price && category && materials.length != 0;
+    let savingChanges = false;
+
+    $: allowSubmit = name && description && price && category && materials.length != 0 && !savingChanges;
 
     onMount(() => {
         if (productRecord.product.id != -1) {
@@ -55,10 +59,29 @@
         variants = variants;
     }
 
-    function saveChanges() {
+    // ? why not use form actions? I find it weird to put hidden input fields with binded values, it's much cleaner to just include neccessary data in the body using fetch
 
+    async function saveChanges() {
+        savingChanges = true;
+        
+        const res = await fetch('/api/admin/updateProduct', { method: "POST", body: JSON.stringify({
+            id: productRecord.product.id,
+            name,
+            price,
+            description,
+            category,
+            materials: materials.join(','),
+            variants
+        }) });
 
-        fetch('/api/admin/product', { method: "POST" });
+        if (res.redirected) await goto(res.url);
+
+        savingChanges = false;
+    }
+
+    async function deleteProduct() {
+        const res = await fetch('/api/admin/deleteProduct', { method: "POST", body: productRecord.product.id.toString() });
+        if (res.redirected) await goto(res.url);
     }
 </script>
 
@@ -70,10 +93,18 @@
     <svelte:fragment slot="topbar">
         <a href="/admin/products" class="text-button">Return</a>
 
-
         <div class="flex gap-4">
-            <button class="text-button-outlined outline-rose-400 text-rose-400">Delete product</button>
-            <button class="text-button" disabled={!allowSubmit} on:click={saveChanges}>Save changes</button>
+            <button class="text-button-outlined outline-rose-400 text-rose-400" on:click={deleteProduct}>
+                Delete product
+            </button>
+
+            <button class="text-button" disabled={!allowSubmit} on:click={saveChanges}>
+                {#if savingChanges}
+                <ProgressIndicator fillColor="white" />
+                {:else}
+                Save changes
+                {/if}
+            </button>
         </div>
     </svelte:fragment>
 
@@ -124,7 +155,7 @@
                 <table id="variant-editor">
                     <tr>
                         <td class="align-top">
-                            <InputField label="Color" placeholder="Color" />
+                            <InputField label="Color" placeholder="Color" bind:value={v.color} />
                         </td>
 
                         <td class="align-bottom" style="width: 28rem">

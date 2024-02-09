@@ -1,4 +1,5 @@
 import type { Product, ProductFetchOptions, ProductRecord, ProductVariant } from "$lib/types/product";
+import type { ProductData } from "../validation/update-product-schema";
 import { db } from "./database";
 
 const productsCache = new Map<number, ProductRecord>();
@@ -97,4 +98,57 @@ export function getProductById(id: number) {
 
 export function getProductCategories() {
     return db.prepare("SELECT DISTINCT category FROM product").pluck(true).all() as string[];
+}
+
+
+const insertVariantStmnt = db.prepare("INSERT INTO product_variant VALUES(NULL, ?, ?, ?)");
+
+const insertProductTransaction = db.transaction((data: ProductData) => {
+    const productId = db.prepare("INSERT INTO product VALUES(NULL, $name, $price, $description, $category, $materials)").run(data).lastInsertRowid as number;
+
+    data.id = productId;
+
+    updateProductCache(data);
+
+    return productId;
+});
+
+export function insertProduct(data: ProductData) {
+    return insertProductTransaction(data);
+}
+
+
+const updateProductTransaction = db.transaction((data: ProductData) => {
+    db.prepare("UPDATE product SET name = $name, price = $price, description = $description, category = $category, materials = $materials WHERE id = $id").run(data);
+
+    // ? approach 1: go through existing variants and delete/update accordingly
+    // ? approach 2: deleteing existing variants and insert new ones
+    // ? we'll be going with approach 2 because it's simpler
+
+    db.prepare("DELETE FROM product_variant WHERE product_id = ?").run(data.id);
+
+    updateProductCache(data);
+})
+
+function updateProductCache(data: ProductData) {
+    const variants: ProductVariant[] = [];
+    data.variants.forEach(v => {
+        const stockMap = JSON.stringify(v.stock);
+        const variantId = insertVariantStmnt.run(data.id, v.color, stockMap).lastInsertRowid as number;
+        
+        variants.push({ id: variantId, color: v.color, product_id: data.id, stock_map: stockMap });
+    });
+
+    const record = { product: { id: data.id, category: data.category, description: data.description, materials: data.materials, name: data.name, price: data.price }, variants } as ProductRecord;
+
+    productsCache.set(data.id, record);
+}
+
+export function updateProduct(data: ProductData) {
+    updateProductTransaction(data);
+}
+
+export function deleteProduct(id: number) {
+    db.prepare("DELETE FROM product WHERE id = ?").run(id);
+    productsCache.delete(id);
 }

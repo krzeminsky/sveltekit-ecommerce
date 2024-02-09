@@ -17,3 +17,8 @@ export const updateProductSchema = z.object({
         }))
     }))
 });
+
+// * stringyfing 'stock' on client side might be a viable option in the future
+// * not sure why past me wanted this to be an array so it will stay this way until I remeber why I wrote it this way lmao
+
+export type ProductData = z.infer<typeof updateProductSchema>;

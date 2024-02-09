@@ -32,7 +32,7 @@ CREATE TABLE product_variant (
     color TEXT NOT NULL,
     stock_map TEXT NOT NULL,
 
-    FOREIGN KEY (product_id) REFERENCES product(id)
+    FOREIGN KEY (product_id) REFERENCES product(id) ON DELETE CASCADE
 );
 
 CREATE TABLE product_order (
