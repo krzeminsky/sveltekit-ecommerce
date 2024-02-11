@@ -25,7 +25,7 @@
 
     let awaitingResponse = false;
 
-    const productsPerPage = 10;
+    const productsPerPage = 15;
     let currentPage = 0;
     let pageCount = Math.ceil(data.productCount / productsPerPage);
 

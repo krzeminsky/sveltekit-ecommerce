@@ -1,6 +1,6 @@
 import type { Product, ProductRecord, ProductVariant } from "$lib/types/product";
 import type { ProductFetchOptions } from "$lib/validation/get-product-schema";
-import type { ProductData } from "../validation/update-product-schema";
+import type { ProductData } from "../../validation/update-product-schema";
 import { db } from "./database";
 
 const productsCache = new Map<number, ProductRecord>();

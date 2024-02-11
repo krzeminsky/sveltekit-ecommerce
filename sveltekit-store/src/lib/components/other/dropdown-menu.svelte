@@ -49,14 +49,12 @@
     </button>
 
     {#if expand}
-    <div id="options" class="absolute w-full top-full mt-2 left-0 grid bg-white shadow-md rounded-lg overflow-hidden z-10" role="menu" transition:fade={{duration: 100, easing: cubicInOut}}>
+    <div id="options" class="absolute w-full top-full mt-2 left-0 grid divide-y divide-gray-100 bg-white shadow-md rounded-lg overflow-hidden z-10" role="menu" transition:fade={{duration: 100, easing: cubicInOut}}>
         {#each options as o, i}
         {@const isItemSelected = selected.includes(i)}
         <button on:click={() => select(i)} role="option" aria-selected={isItemSelected}>
-            <span class="relative">
-                {o}
-                {#if isItemSelected}<img src="/icons/tick.svg" alt="selected" class="absolute left-full top-0 ml-2" />{/if}
-            </span>
+            <span class="relative ml-4 float-left">{o}</span>
+            {#if isItemSelected}<img src="/icons/tick.svg" alt="selected" class="float-right inline-block mr-6 align-middle" />{/if}
         </button>
         {/each}
     </div>

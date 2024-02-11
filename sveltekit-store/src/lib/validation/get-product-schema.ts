@@ -1,7 +1,7 @@
 import z from "zod";
 
-export const getProductSchema = z.object({
-    count: z.number().min(0).max(10),
+export const fetchProductSchema = z.object({
+    count: z.number().min(0).max(20),
     page: z.number().min(0),
     options: z.object({
         name: z.string().optional(),
@@ -25,4 +25,4 @@ export const getProductSchema = z.object({
     }).optional()
 })
 
-export type ProductFetchOptions = z.infer<typeof getProductSchema>;
+export type ProductFetchOptions = z.infer<typeof fetchProductSchema>;

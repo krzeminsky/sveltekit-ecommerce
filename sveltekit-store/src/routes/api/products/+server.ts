@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit';
-import { getProductSchema } from '$lib/validation/get-product-schema.js';
+import { fetchProductSchema } from '$lib/validation/get-product-schema.js';
 import { fetchProducts } from '$lib/server/database/products.js';
 
 export const GET = async ({ url }) => {
@@ -9,7 +9,7 @@ export const GET = async ({ url }) => {
     const data = JSON.parse(queryString);
     
     try {
-        const parsedData = getProductSchema.parse(data);
+        const parsedData = fetchProductSchema.parse(data);
         
         return new Response(JSON.stringify(fetchProducts(parsedData.count, parsedData.page, parsedData)));
     } catch {

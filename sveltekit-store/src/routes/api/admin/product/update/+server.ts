@@ -1,5 +1,5 @@
 import { insertProduct, updateProduct } from "$lib/server/database/products";
-import { updateProductSchema } from "$lib/server/validation/update-product-schema";
+import { updateProductSchema } from "$lib/validation/update-product-schema";
 import { error, redirect } from "@sveltejs/kit";
 
 export const POST = async ({ request }) => {

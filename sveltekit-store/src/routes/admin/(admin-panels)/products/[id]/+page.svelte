@@ -8,6 +8,7 @@
     import type { PageData } from "./$types";
     import ProgressIndicator from "$lib/components/ui/progress-indicator.svelte";
     import { goto } from "$app/navigation";
+    import type { ProductData } from "$lib/validation/update-product-schema";
 
     export let data: PageData;
 
@@ -64,7 +65,7 @@
     async function saveChanges() {
         savingChanges = true;
         
-        const res = await fetch('/api/admin/updateProduct', { method: "POST", body: JSON.stringify({
+        const res = await fetch('/api/admin/product/update', { method: "POST", body: JSON.stringify({
             id: productRecord.product.id,
             name,
             price,
@@ -72,7 +73,7 @@
             category,
             materials: materials.join(','),
             variants
-        }) });
+        } as ProductData ) });
 
         if (res.redirected) await goto(res.url);
 
@@ -80,7 +81,7 @@
     }
 
     async function deleteProduct() {
-        const res = await fetch('/api/admin/deleteProduct', { method: "POST", body: productRecord.product.id.toString() });
+        const res = await fetch('/api/admin/product/delete', { method: "POST", body: productRecord.product.id.toString() });
         if (res.redirected) await goto(res.url);
     }
 </script>
@@ -98,7 +99,7 @@
                 Delete product
             </button>
 
-            <button class="text-button" disabled={!allowSubmit} on:click={saveChanges}>
+            <button class="text-button w-32" disabled={!allowSubmit} on:click={saveChanges}>
                 {#if savingChanges}
                 <ProgressIndicator fillColor="white" />
                 {:else}
@@ -134,17 +135,13 @@
                 </td>
             </tr>
 
-            <tr>
-                <td>
-                    <InputField id="unitPrice" label="Unit price" placeholder="Unit price" type="number" bind:value={price}/>
-                </td>
-            </tr>
+            <tr><td>
+                <InputField id="unitPrice" label="Unit price" placeholder="Unit price" type="number" bind:value={price}/>
+            </td></tr>
 
-            <tr>
-                <td>
-                    <InputField id="category" label="Category" placeholder="Category" bind:value={category} />
-                </td>
-            </tr>
+            <tr><td>
+                <InputField id="category" label="Category" placeholder="Category" bind:value={category} />
+            </td></tr>
         </table>
 
         <h1 class="text-indigo-500 text-3xl mb-8">Product variants</h1>
@@ -155,7 +152,18 @@
                 <table id="variant-editor">
                     <tr>
                         <td class="align-top">
+                            <h1 class="text-2xl text-indigo-500 pb-2">Properties</h1>
+                            
                             <InputField label="Color" placeholder="Color" bind:value={v.color} />
+
+                            <h1 class="text-2xl text-indigo-500 mt-4 mb-2">Galery</h1>
+
+                            <div>
+                                <button class="p-2 aspect-square border-indigo-400 border-dashed border-2 text-indigo-400 text-center text-sm rounded-lg">
+                                    <img src="/icons/image.svg" alt="Add image" class="mx-auto mb-1" />
+                                    Add image
+                                </button>
+                            </div>
                         </td>
 
                         <td class="align-bottom" style="width: 28rem">
