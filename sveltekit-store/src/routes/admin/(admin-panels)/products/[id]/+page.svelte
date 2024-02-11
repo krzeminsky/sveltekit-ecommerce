@@ -158,15 +158,17 @@
 
                             <h1 class="text-2xl text-indigo-500 mt-4 mb-2">Galery</h1>
 
-                            <div>
-                                <button class="p-2 aspect-square border-indigo-400 border-dashed border-2 text-indigo-400 text-center text-sm rounded-lg">
-                                    <img src="/icons/image.svg" alt="Add image" class="mx-auto mb-1" />
+                            <div class="grid grid-cols-3 gap-4">
+                                <button class="p-2 aspect-square h-24 border-indigo-400 border-dashed border-2 text-indigo-400 text-center text-sm rounded-lg">
+                                    <img src="/icons/image.svg" alt="" class="mx-auto mb-1" />
                                     Add image
                                 </button>
                             </div>
                         </td>
 
-                        <td class="align-bottom" style="width: 28rem">
+                        <td class="align-top" style="width: 28rem">
+                            <h1 class="text-2xl text-indigo-500 pb-2">Variants</h1>
+                            
                             <div class="grid grid-cols-3 gap-2 justify-center">
                                 {#each v.stock as pair, i (pair)}
                                 <InputField label="Size" placeholder="Size" bind:value={pair.size} />
@@ -184,7 +186,7 @@
                         </td>
 
                         <td class="align-top">
-                            <button class="text-button-outlined outline-rose-400 text-rose-400 mt-6" on:click={() => {variants.splice(i, 1); variants = variants}}>
+                            <button class="text-button-outlined outline-rose-400 text-rose-400" on:click={() => {variants.splice(i, 1); variants = variants}}>
                                 Delete variant
                             </button>
                         </td>
