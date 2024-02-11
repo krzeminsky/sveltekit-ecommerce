@@ -19,8 +19,10 @@ export const getProductSchema = z.object({
         }).optional(),
 
         sortOptions: z.object({
-            sortBy: z.literal("Price").or(z.literal("Name")),
+            sortBy: z.literal("Price").or(z.literal("Name").or(z.literal("Id"))),
             descending: z.boolean()
-        })
-    })
+        }).optional()
+    }).optional()
 })
+
+export type ProductFetchOptions = z.infer<typeof getProductSchema>;

@@ -1,4 +1,5 @@
-import type { Product, ProductFetchOptions, ProductRecord, ProductVariant } from "$lib/types/product";
+import type { Product, ProductRecord, ProductVariant } from "$lib/types/product";
+import type { ProductFetchOptions } from "$lib/validation/get-product-schema";
 import type { ProductData } from "../validation/update-product-schema";
 import { db } from "./database";
 
@@ -31,9 +32,10 @@ function includesAny(val: string, search: string[]) {
     return false;
 }
 
-export function fetchProducts(count: number, page: number, options?: ProductFetchOptions) {
+export function fetchProducts(count: number, page: number, fetchOptions?: ProductFetchOptions) {
     let products = Array.from(productsCache.values());
-
+    const options = fetchOptions?.options;
+    
     if (options) {
         if (options.priceRange) {
             const range = options.priceRange!;
@@ -79,12 +81,14 @@ export function fetchProducts(count: number, page: number, options?: ProductFetc
                     if (a.product.name > b.product.name) return 1 * inverse;
                     return 0;
                 });
-            } else {
+            } else if (options.sortOptions.sortBy == "Price") {           
                 products.sort((a, b) => {
                     if (a.product.price > b.product.price) return -1 * inverse;
                     if (a.product.price < b.product.price) return 1 * inverse;
                     return 0;
                 });
+            } else if (options.sortOptions.descending) {
+                products.reverse();
             }
         }
     }

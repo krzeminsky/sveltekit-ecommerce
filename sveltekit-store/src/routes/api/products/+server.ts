@@ -11,7 +11,7 @@ export const GET = async ({ url }) => {
     try {
         const parsedData = getProductSchema.parse(data);
         
-        return new Response(JSON.stringify(fetchProducts(parsedData.count, parsedData.page, parsedData.options)));
+        return new Response(JSON.stringify(fetchProducts(parsedData.count, parsedData.page, parsedData)));
     } catch {
         return error(400);
     }

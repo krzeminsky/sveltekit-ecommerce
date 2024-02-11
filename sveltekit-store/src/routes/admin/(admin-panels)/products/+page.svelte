@@ -5,15 +5,17 @@
     import type { PageData } from "./$types";
     import IconButton from "$lib/components/ui/icon-button.svelte";
     import TopbarContentLayout from "$lib/components/layouts/topbar-content-layout.svelte";
-    import type { Product, ProductFetchOptions } from "$lib/types/product";
+    import type { ProductRecord } from "$lib/types/product";
     import { onMount } from "svelte";
     import ProgressIndicator from "$lib/components/ui/progress-indicator.svelte";
+    import { goto } from "$app/navigation";
+    import type { ProductFetchOptions } from "$lib/validation/get-product-schema";
 
     export let data: PageData;
 
-    const sortOptions = ["Name", "Price"];
+    const sortOptions = ["Id", "Name", "Price"];
 
-    let products: Product[] = [];
+    let products: ProductRecord[] = [];
 
     let searchValue: string;
     let selectedSortOption: number;
@@ -42,8 +44,8 @@
                     sortBy: sortOptions[selectedSortOption],
                     descending: sortDescending
                 }
-            } as ProductFetchOptions
-        });
+            }
+        } as ProductFetchOptions);
 
         const res = await fetch(`/api/products?query=${query}`, { method: "GET" })
 
@@ -81,8 +83,30 @@
             {#if products.length == 0}
             <h1 class="placeholder-center-text">Future products will be displayed here</h1>
             {:else}
-            .
+            <table class="w-full divide-y-2 divide-gray-100">
+                <tr>
+                    <td>Id</td>
+                    <td>Name</td>
+                    <td>Price</td>
+                    <td>Category</td>
+                </tr>
+
+                {#each products as p}
+                <tr class="bg-transparent hover:bg-gray-100 transition-all cursor-pointer" on:click={() => goto(`/admin/products/${p.product.id}`) }>
+                    <td>{p.product.id}</td>
+                    <td>{p.product.name}</td>
+                    <td>{p.product.price}</td>
+                    <td>{p.product.category}</td>
+                </tr>
+                {/each}
+            </table>
             {/if}
         {/if}
     </svelte:fragment>
 </TopbarContentLayout>
+
+<style lang="postcss">
+    table td {
+        @apply p-2;
+    }
+</style>
