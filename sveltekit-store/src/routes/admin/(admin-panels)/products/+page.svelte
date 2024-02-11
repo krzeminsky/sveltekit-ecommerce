@@ -25,6 +25,10 @@
 
     let awaitingResponse = false;
 
+    const productsPerPage = 10;
+    let currentPage = 0;
+    let pageCount = Math.ceil(data.productCount / productsPerPage);
+
     onMount(() => {
         fetchProducts();
     })
@@ -35,8 +39,8 @@
         awaitingResponse = true;
 
         const query = JSON.stringify({
-            page: 0,
-            count: 10,
+            page: currentPage,
+            count: productsPerPage,
             options: {
                 name: searchValue,
                 categories,
@@ -53,6 +57,20 @@
 
         awaitingResponse = false;
     }
+
+    async function refreshProducts() {
+        currentPage = 0;
+
+        await fetchProducts();
+    }
+
+    async function switchPage(direction: -1|1) {
+        let newPage = currentPage + direction;
+        if (newPage == -1 || newPage == pageCount) return;
+
+        currentPage = newPage;
+        await fetchProducts();
+    }
 </script>
 
 <svelte:head>
@@ -68,7 +86,7 @@
 
             <DropdownMenu label="Cateogry" allowMultiple={true} options={data.categories} bind:selected={selectedCategories} />
 
-            <IconButton src="/icons/refresh.svg" alt="Refresh products" on:click={fetchProducts} />
+            <IconButton src="/icons/refresh.svg" alt="Refresh products" on:click={refreshProducts} />
         </div>
     
         <a href="products/-1" class="text-button">Add product</a>
@@ -83,30 +101,50 @@
             {#if products.length == 0}
             <h1 class="placeholder-center-text">Future products will be displayed here</h1>
             {:else}
-            <table class="w-full divide-y-2 divide-gray-100">
-                <tr>
-                    <td>Id</td>
-                    <td>Name</td>
-                    <td>Price</td>
-                    <td>Category</td>
-                </tr>
+            <div class="w-full h-full flex flex-col">
+                <div class="flex-1 basis-0 overflow-y-auto">
+                    <table class="w-full overflow-y-auto divide-y-2 divide-gray-100">
+                        <tr>
+                            <td class="text-gray-400">Id</td>
+                            <td>Name</td>
+                            <td>Price</td>
+                            <td>Category</td>
+                        </tr>
+        
+                        {#each products as p}
+                        <tr class="bg-transparent hover:bg-gray-100 transition-all cursor-pointer" on:click={() => goto(`/admin/products/${p.product.id}`) }>
+                            <td class="text-gray-400">{p.product.id}</td>
+                            <td>{p.product.name}</td>
+                            <td>{p.product.price}</td>
+                            <td>{p.product.category}</td>
+                        </tr>
+                        {/each}
+                    </table>
+                </div>
 
-                {#each products as p}
-                <tr class="bg-transparent hover:bg-gray-100 transition-all cursor-pointer" on:click={() => goto(`/admin/products/${p.product.id}`) }>
-                    <td>{p.product.id}</td>
-                    <td>{p.product.name}</td>
-                    <td>{p.product.price}</td>
-                    <td>{p.product.category}</td>
-                </tr>
-                {/each}
-            </table>
+                <div id="page-navigator" class="mx-auto">
+                    <button class="clear-icon-button" on:click={() => switchPage(-1)}>
+                        <img src="/icons/navigate/navigate-before.svg" alt="Previous page" />
+                    </button>
+                    
+                    <h1 class="px-2">{currentPage + 1} / {pageCount}</h1>
+                    
+                    <button class="clear-icon-button" on:click={() => switchPage(1)}>
+                        <img src="/icons/navigate/navigate-next.svg" alt="Next page" />
+                    </button>
+                </div>
+            </div>
             {/if}
         {/if}
     </svelte:fragment>
 </TopbarContentLayout>
 
 <style lang="postcss">
+    #page-navigator * {
+        @apply inline-block align-middle;
+    }
+
     table td {
-        @apply p-2;
+        @apply p-2 align-top;
     }
 </style>

@@ -93,7 +93,7 @@ export function fetchProducts(count: number, page: number, fetchOptions?: Produc
         }
     }
 
-    return products.slice(count * page, count);
+    return products.slice(count * page, page + count);
 }
 
 export function getProductById(id: number) {
@@ -155,4 +155,8 @@ export function updateProduct(data: ProductData) {
 export function deleteProduct(id: number) {
     db.prepare("DELETE FROM product WHERE id = ?").run(id);
     productsCache.delete(id);
+}
+
+export function getProductCount() {
+    return productsCache.size;
 }
